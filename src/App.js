@@ -1,140 +1,23 @@
 import React, { useState } from 'react';
 import { login, getProducts, createOrder } from './api';
 
-function App() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [message, setMessage] = useState('');
-  const [msgType, setMsgType] = useState('');
-
-  const handleLogin = async () => {
-    try {
-      await login(username, password);
-      setIsLoggedIn(true);
-      loadProducts();
-    } catch {
-      setMessage('Username বা Password ভুল!');
-      setMsgType('error');
-    }
-  };
-
-  const loadProducts = async () => {
-    try {
-      const data = await getProducts();
-      setProducts(data.results);
-    } catch {
-      setMessage('Products load হয়নি!');
-      setMsgType('error');
-    }
-  };
-
-  const handleOrder = async (productId) => {
-    try {
-      await createOrder({ product_id: productId, quantity: 1 });
-      setMessage('✅ Order সফল হয়েছে!');
-      setMsgType('success');
-      loadProducts();
-    } catch {
-      setMessage('❌ Order হয়নি!');
-      setMsgType('error');
-    }
-  };
-
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-          <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">🛒 Ecommerce Store</h1>
-          <p className="text-center text-gray-500 mb-8">আপনার account-এ login করুন</p>
-
-          {message && (
-            <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-4 text-center">
-              {message}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-              <input
-                type="text"
-                placeholder="Username দিন"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                placeholder="Password দিন"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && handleLogin()}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={handleLogin}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200"
-            >
-              Login করুন
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-blue-600 text-white px-6 py-4 shadow-lg">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">🛒 Ecommerce Store</h1>
-          <span className="text-blue-200">স্বাগতম, {username}!</span>
-        </div>
-      </nav>
-
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {message && (
-          <div className={`mb-6 px-4 py-3 rounded-lg text-center font-medium ${
-            msgType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-          }`}>
-            {message}
-          </div>
-        )}
-
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">সব Products</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products && products.map(product => (
-            <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-200 p-6">
-              <div className="text-4xl mb-3 text-center">👕</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{product.name}</h3>
-              <p className="text-2xl font-bold text-blue-600 mb-1">৳{product.price}</p>
-              <p className={`text-sm mb-4 ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {product.stock > 0 ? `✅ Stock: ${product.stock}` : '❌ Stock নেই'}
-              </p>
-              <button
-                onClick={() => handleOrder(product.id)}
-                disabled={product.stock === 0}
-                className={`w-full py-2 rounded-lg font-bold transition duration-200 ${
-                  product.stock > 0
-                    ? 'bg-green-500 hover:bg-green-600 text-white'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {product.stock > 0 ? '🛍️ Order করুন' : 'Stock নেই'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default App;
+const styles = {
+  body: { margin: 0, fontFamily: "'Segoe UI', sans-serif", background: '#f0f2f5', minHeight: '100vh' },
+  loginPage: { minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  loginBox: { background: 'white', borderRadius: '20px', padding: '40px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' },
+  loginTitle: { textAlign: 'center', fontSize: '28px', fontWeight: 'bold', color: '#333', marginBottom: '8px' },
+  loginSubtitle: { textAlign: 'center', color: '#888', marginBottom: '30px' },
+  label: { display: 'block', fontSize: '14px', fontWeight: '600', color: '#555', marginBottom: '6px' },
+  input: { width: '100%', padding: '12px 16px', border: '2px solid #e1e5e9', borderRadius: '10px', fontSize: '16px', outline: 'none', boxSizing: 'border-box', marginBottom: '16px' },
+  loginBtn: { width: '100%', padding: '14px', background: 'linear-gradient(135deg, #667eea, #764ba2)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' },
+  nav: { background: 'linear-gradient(135deg, #667eea, #764ba2)', color: 'white', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' },
+  navTitle: { fontSize: '24px', fontWeight: 'bold', margin: 0 },
+  container: { maxWidth: '1200px', margin: '0 auto', padding: '30px 20px' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' },
+  card: { background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', transition: 'transform 0.2s' },
+  emoji: { fontSize: '48px', textAlign: 'center', marginBottom: '12px' },
+  productName: { fontSize: '18px', fontWeight: 'bold', color: '#333', marginBottom: '8px' },
+  price: { fontSize: '24px', fontWeight: 'bold', color: '#667eea', marginBottom: '6px' },
+  stock: { fontSize: '13px', color: '#27ae60', marginBottom: '16px' },
+  orderBtn: { width: '100%', padding: '12px', background: 'linear-gradient(135deg, #27ae60, #2ecc71)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer' },
+  successMsg: { background: '#d4edda', color:
