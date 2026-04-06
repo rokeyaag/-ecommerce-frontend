@@ -10,7 +10,7 @@ export const login = async (username, password) => {
     return res.data;
 };
 
-eexport const getProducts = async () => {
+export const getProducts = async () => {
     const res = await axios.get(`${API}/api/products/?page_size=100`, {
         headers: { Authorization: `Bearer ${getToken()}` }
     });
