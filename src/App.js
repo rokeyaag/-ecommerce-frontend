@@ -1,121 +1,89 @@
 import React, { useState } from 'react';
-import { login, getProducts, createOrder, getOrders } from './api';
+import { login, getProducts, createOrder } from './api';
 
 function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [message, setMessage] = useState('');
   const [msgType, setMsgType] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [ordering, setOrdering] = useState(null);
-  const [activeTab, setActiveTab] = useState('products');
 
   const handleLogin = async () => {
-    setLoading(true);
     try {
       await login(username, password);
       setIsLoggedIn(true);
       loadProducts();
-      loadOrders();
-      setMessage('');
     } catch {
       setMessage('Username বা Password ভুল!');
       setMsgType('error');
     }
-    setLoading(false);
   };
 
   const loadProducts = async () => {
     try {
       const data = await getProducts();
-      setProducts(data.results);
+      setProducts(data.results || data);
     } catch {
       setMessage('Products load হয়নি!');
       setMsgType('error');
     }
   };
 
-  const loadOrders = async () => {
-    try {
-      const data = await getOrders();
-      setOrders(data);
-    } catch {
-      setMessage('Orders load হয়নি!');
-      setMsgType('error');
-    }
-  };
-
   const handleOrder = async (productId) => {
-    setOrdering(productId);
     try {
       await createOrder({ product_id: productId, quantity: 1 });
-      setMessage('Order সফল হয়েছে!');
+      setMessage('✅ Order সফল হয়েছে!');
       setMsgType('success');
+      setTimeout(() => setMessage(''), 3000);
       loadProducts();
-      loadOrders();
     } catch {
-      setMessage('Order হয়নি! Stock শেষ হতে পারে।');
+      setMessage('❌ Order হয়নি!');
       setMsgType('error');
     }
-    setOrdering(null);
-    setTimeout(() => setMessage(''), 3000);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    setProducts([]);
-    setOrders([]);
-    setUsername('');
-    setPassword('');
+  const S = {
+    page: { minHeight: '100vh', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', fontFamily: "'Segoe UI', sans-serif" },
+    loginWrap: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
+    loginCard: { background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', padding: '48px', width: '100%', maxWidth: '420px' },
+    loginTitle: { color: '#fff', fontSize: '32px', fontWeight: '700', textAlign: 'center', marginBottom: '8px' },
+    loginSub: { color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginBottom: '40px', fontSize: '14px' },
+    label: { display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px', letterSpacing: '0.5px' },
+    input: { width: '100%', padding: '14px 18px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', color: '#fff', fontSize: '15px', outline: 'none', boxSizing: 'border-box', marginBottom: '20px' },
+    loginBtn: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #e94560, #0f3460)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '700', cursor: 'pointer', letterSpacing: '0.5px' },
+    nav: { background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 },
+    navTitle: { color: '#fff', fontSize: '22px', fontWeight: '700', margin: 0 },
+    navUser: { background: 'linear-gradient(135deg, #e94560, #0f3460)', color: '#fff', padding: '8px 20px', borderRadius: '20px', fontSize: '13px', fontWeight: '600' },
+    container: { maxWidth: '1400px', margin: '0 auto', padding: '40px 24px' },
+    heading: { color: '#fff', fontSize: '28px', fontWeight: '700', marginBottom: '8px' },
+    subHeading: { color: 'rgba(255,255,255,0.4)', fontSize: '14px', marginBottom: '32px' },
+    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '24px' },
+    card: { background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', transition: 'transform 0.2s', cursor: 'default' },
+    emoji: { fontSize: '52px', textAlign: 'center', marginBottom: '16px', display: 'block' },
+    productName: { color: '#fff', fontSize: '18px', fontWeight: '700', marginBottom: '8px' },
+    price: { background: 'linear-gradient(135deg, #e94560, #f5a623)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '26px', fontWeight: '800', marginBottom: '8px' },
+    stock: { color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginBottom: '20px' },
+    orderBtn: { width: '100%', padding: '13px', background: 'linear-gradient(135deg, #e94560, #0f3460)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', letterSpacing: '0.3px' },
+    successMsg: { background: 'rgba(39, 174, 96, 0.2)', border: '1px solid #27ae60', color: '#2ecc71', padding: '14px 20px', borderRadius: '12px', textAlign: 'center', marginBottom: '24px', fontWeight: '600' },
+    errorMsg: { background: 'rgba(231, 76, 60, 0.2)', border: '1px solid #e74c3c', color: '#ff6b6b', padding: '14px 20px', borderRadius: '12px', textAlign: 'center', marginBottom: '24px', fontWeight: '600' },
   };
+
+  const emojis = ['👕', '👗', '👟', '👜', '⌚', '🕶️', '🧥', '👔'];
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="text-6xl mb-4">🛍️</div>
-            <h1 className="text-4xl font-bold text-white mb-2">ShopBD</h1>
-            <p className="text-purple-300">বাংলাদেশের সেরা অনলাইন শপ</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Login করুন</h2>
-            {message && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-4 text-center text-sm">
-                {message}
-              </div>
-            )}
-            <div className="mb-4">
-              <label className="block text-purple-300 text-sm font-medium mb-2">Username</label>
-              <input
-                className="w-full bg-white/10 border border-white/20 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:border-purple-400 transition"
-                placeholder="আপনার username"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-purple-300 text-sm font-medium mb-2">Password</label>
-              <input
-                className="w-full bg-white/10 border border-white/20 text-white placeholder-white/40 rounded-xl px-4 py-3 outline-none focus:border-purple-400 transition"
-                type="password"
-                placeholder="আপনার password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && handleLogin()}
-              />
-            </div>
-            <button
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl transition transform hover:scale-105 disabled:opacity-50"
-              onClick={handleLogin}
-              disabled={loading}
-            >
-              {loading ? 'Loading...' : 'Login করুন →'}
-            </button>
+      <div style={S.page}>
+        <div style={S.loginWrap}>
+          <div style={S.loginCard}>
+            <h1 style={S.loginTitle}>🛒 ShopBD</h1>
+            <p style={S.loginSub}>আপনার account-এ login করুন</p>
+            {message && <div style={S.errorMsg}>{message}</div>}
+            <label style={S.label}>USERNAME</label>
+            <input style={S.input} placeholder="Username দিন" value={username} onChange={e => setUsername(e.target.value)} />
+            <label style={S.label}>PASSWORD</label>
+            <input style={S.input} type="password" placeholder="Password দিন" value={password} onChange={e => setPassword(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleLogin()} />
+            <button style={S.loginBtn} onClick={handleLogin}>Login করুন →</button>
           </div>
         </div>
       </div>
@@ -123,141 +91,28 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <nav className="bg-gray-900/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🛍️</span>
-            <div>
-              <h1 className="text-xl font-bold text-white">ShopBD</h1>
-              <p className="text-xs text-purple-400">Online Store</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">স্বাগতম, <span className="text-purple-400 font-semibold">{username}</span></span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 text-red-400 text-sm px-4 py-2 rounded-xl transition"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
+    <div style={S.page}>
+      <nav style={S.nav}>
+        <h1 style={S.navTitle}>🛒 ShopBD</h1>
+        <span style={S.navUser}>👋 {username}</span>
       </nav>
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {message && (
-          <div className={`mb-6 px-6 py-4 rounded-2xl text-center font-semibold text-sm ${
-            msgType === 'success'
-              ? 'bg-green-500/20 border border-green-500/30 text-green-400'
-              : 'bg-red-500/20 border border-red-500/30 text-red-400'
-          }`}>
-            {msgType === 'success' ? '✅' : '❌'} {message}
-          </div>
-        )}
-
-        <div className="flex gap-2 mb-8 bg-gray-900 p-1 rounded-2xl w-fit">
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`px-6 py-2 rounded-xl font-semibold text-sm transition ${
-              activeTab === 'products'
-                ? 'bg-purple-500 text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            🛒 Products
-          </button>
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`px-6 py-2 rounded-xl font-semibold text-sm transition ${
-              activeTab === 'orders'
-                ? 'bg-purple-500 text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            📦 My Orders {orders.length > 0 && <span className="ml-1 bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full">{orders.length}</span>}
-          </button>
+      <div style={S.container}>
+        {message && <div style={msgType === 'success' ? S.successMsg : S.errorMsg}>{message}</div>}
+        <h2 style={S.heading}>সব Products</h2>
+        <p style={S.subHeading}>{products.length} টি product পাওয়া গেছে</p>
+        <div style={S.grid}>
+          {products && products.map((product, index) => (
+            <div key={product.id} style={S.card}>
+              <span style={S.emoji}>{emojis[index % emojis.length]}</span>
+              <div style={S.productName}>{product.name}</div>
+              <div style={S.price}>৳{product.price}</div>
+              <div style={S.stock}>📦 Stock: {product.stock} টি বাকি</div>
+              <button style={S.orderBtn} onClick={() => handleOrder(product.id)}>
+                🛍️ Order করুন
+              </button>
+            </div>
+          ))}
         </div>
-
-        {activeTab === 'products' && (
-          <div>
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-white mb-1">সব Products</h2>
-              <p className="text-gray-500">আপনার পছন্দের product বেছে নিন</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products && products.map(product => (
-                <div key={product.id} className="bg-gray-900 border border-white/10 rounded-2xl overflow-hidden hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition group">
-                  <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 h-48 flex items-center justify-center text-7xl">
-                    🛒
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-400 transition">{product.name}</h3>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-2xl font-bold text-purple-400">৳{product.price}</span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        product.stock > 5
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                          : product.stock > 0
-                          ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                          : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                      }`}>
-                        {product.stock > 0 ? `Stock: ${product.stock}` : 'Stock শেষ'}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleOrder(product.id)}
-                      disabled={product.stock === 0 || ordering === product.id}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition transform hover:scale-105 disabled:scale-100 text-sm"
-                    >
-                      {ordering === product.id ? 'Processing...' : product.stock === 0 ? 'Stock নেই' : '🛍️ Order করুন'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'orders' && (
-          <div>
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-white mb-1">আমার Orders</h2>
-              <p className="text-gray-500">আপনার সব orders এখানে দেখুন</p>
-            </div>
-            {orders.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="text-6xl mb-4">📦</div>
-                <p className="text-gray-500 text-lg">কোনো order নেই</p>
-                <button
-                  onClick={() => setActiveTab('products')}
-                  className="mt-4 bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl transition"
-                >
-                  Products দেখুন →
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {orders.map(order => (
-                  <div key={order.id} className="bg-gray-900 border border-white/10 rounded-2xl p-6 flex items-center justify-between hover:border-purple-500/30 transition">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-purple-500/20 border border-purple-500/30 rounded-xl p-3 text-2xl">📦</div>
-                      <div>
-                        <h3 className="font-bold text-white text-lg">{order.product_name}</h3>
-                        <p className="text-gray-400 text-sm">Quantity: {order.quantity} টি</p>
-                        <p className="text-gray-500 text-xs mt-1">{new Date(order.created_at).toLocaleDateString('bn-BD')}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-purple-400">৳{order.total_price}</p>
-                      <span className="text-xs bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-1 rounded-full">Completed</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
