@@ -10,13 +10,12 @@ export const login = async (username, password) => {
     return res.data;
 };
 
-export const getProducts = async () => {
-    const res = await axios.get(`${API}/api/products/`, {
+eexport const getProducts = async () => {
+    const res = await axios.get(`${API}/api/products/?page_size=100`, {
         headers: { Authorization: `Bearer ${getToken()}` }
     });
     return res.data;
 };
-
 export const createProduct = async (data) => {
     const res = await axios.post(`${API}/api/products/`, data, {
         headers: { Authorization: `Bearer ${getToken()}` }
@@ -26,6 +25,12 @@ export const createProduct = async (data) => {
 
 export const createOrder = async (data) => {
     const res = await axios.post(`${API}/api/orders/`, data, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    return res.data;
+};
+export const getOrders = async () => {
+    const res = await axios.get(`${API}/api/orders/`, {
         headers: { Authorization: `Bearer ${getToken()}` }
     });
     return res.data;
