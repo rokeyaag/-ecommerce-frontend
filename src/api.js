@@ -1,5 +1,4 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://ecommerce-api-production-3e99.up.railway.app';
-
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const registerUser = async (username, email, password) => {
